@@ -1,5 +1,4 @@
 """Typer-based CLI entrypoint."""
-
 from __future__ import annotations
 
 import asyncio
@@ -85,7 +84,11 @@ def _export(rows: List[dict], export: str, project: str) -> Path:
 
 
 @app.command()
-def plan(url: str = typer.Option(...), goal: str = typer.Option(...), out: Path = typer.Option(Path("plan.json"))):
+def plan(
+    url: str = typer.Option(..., help="Target URL to scrape"),
+    goal: str = typer.Option(..., help="Scraping goal in natural language"),
+    out: Path = typer.Option(Path("plan.json"), help="Output plan file path")
+):
     """Generate a scraping plan for the target URL and goal."""
 
     configure_logging(get_settings().log_level)
@@ -101,7 +104,12 @@ def plan(url: str = typer.Option(...), goal: str = typer.Option(...), out: Path 
 
 
 @app.command()
-def parse(plan: Path, project: str, limit: int = 100, export: str = typer.Option("json", help="csv|excel|json")):
+def parse(
+    plan: Path = typer.Option(..., help="Path to plan JSON file"),
+    project: str = typer.Option(..., help="Project name"),
+    limit: int = typer.Option(100, help="Maximum items to extract"),
+    export: str = typer.Option("json", help="Export format: csv|excel|json")
+):
     """Execute a scraping plan and persist the results."""
 
     configure_logging(get_settings().log_level)
@@ -122,7 +130,7 @@ def parse(plan: Path, project: str, limit: int = 100, export: str = typer.Option
 
 
 @app.command()
-def resume(project: str):
+def resume(project: str = typer.Option(..., help="Project name to resume")):
     """Resume the latest incomplete run for a project."""
 
     configure_logging(get_settings().log_level)
@@ -151,7 +159,7 @@ def resume(project: str):
 
 
 @app.command()
-def report(project: str):
+def report(project: str = typer.Option(..., help="Project name to report on")):
     """Display a summary of recent runs."""
 
     configure_logging(get_settings().log_level)
@@ -174,5 +182,8 @@ def report(project: str):
 
     asyncio.run(_report())
 
+
+if __name__ == "__main__":
+    app()
 
 __all__ = ["app", "plan", "parse", "resume", "report"]

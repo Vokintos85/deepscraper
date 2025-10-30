@@ -1,0 +1,53 @@
+{
+  "url": "https://books.toscrape.com",
+  "goal": "Собрать названия книг и цены",
+  "steps": [
+    {
+      "action": "navigate",
+      "target": "https://books.toscrape.com",
+      "value": null,
+      "wait": null
+    },
+    {
+      "action": "wait",
+      "target": null,
+      "value": null,
+      "wait": {
+        "type": "network_idle",
+        "selector": null,
+        "timeout_ms": 5000
+      }
+    },
+    {
+      "action": "extract",
+      "target": null,
+      "value": null,
+      "wait": null
+    }
+  ],
+  "fields": [
+    {
+      "name": "title",
+      "selector": "h1, h2, .product-title",
+      "attr": null,
+      "required": false
+    },
+    {
+      "name": "price",
+      "selector": ".price, [data-price]",
+      "attr": null,
+      "required": false
+    },
+    {
+      "name": "sku",
+      "selector": "[data-sku], .sku, .product-sku",
+      "attr": null,
+      "required": false
+    }
+  ],
+  "pagination": {
+    "type": "scroll",
+    "selector": null,
+    "max_pages": 1
+  }
+}
