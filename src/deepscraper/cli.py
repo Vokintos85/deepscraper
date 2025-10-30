@@ -85,9 +85,9 @@ def _export(rows: List[dict], export: str, project: str) -> Path:
 
 @app.command()
 def plan(
-    url: str = typer.Option(..., help="Target URL to scrape"),
-    goal: str = typer.Option(..., help="Scraping goal in natural language"),
-    out: Path = typer.Option(Path("plan.json"), help="Output plan file path")
+    url: str,
+    goal: str,
+    out: Path = Path("plan.json")
 ):
     """Generate a scraping plan for the target URL and goal."""
 
