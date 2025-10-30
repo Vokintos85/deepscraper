@@ -1,0 +1,77 @@
+[tool.poetry]
+name = "deepscraper"
+version = "0.1.0"
+description = "AI-assisted universal scraping platform"
+authors = ["Deepscraper Contributors <dev@example.com>"]
+readme = "README.md"
+packages = [{ include = "deepscraper", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+typer = { extras = ["all"], version = "^0.9.0" }
+pydantic = "^2.6"
+pydantic-settings = "^2.2"
+httpx = "^0.27.0"
+playwright = "^1.41.2"
+python-socketio = "^5.10"
+sqlalchemy = { version = "^2.0", extras = ["asyncio"] }
+psycopg = { version = "^3.1", extras = ["binary"] }
+aiosqlite = "^0.19.0"
+redis = "^5.0.1"
+rq = "^1.15.1"
+structlog = "^24.1.0"
+tenacity = "^8.2.3"
+openpyxl = "^3.1.2"
+pandas = "^2.2.0"
+beautifulsoup4 = "^4.12.0"
+uvicorn = "^0.25.0"
+fastapi = "^0.109.0"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4"
+pytest-asyncio = "^0.23"
+black = "^23.12"
+ruff = "^0.1.13"
+isort = "^5.13"
+mypy = "^1.8.0"
+pytest-mock = "^3.12"
+
+[tool.poetry.scripts]
+deepscraper = "deepscraper.cli:app"
+deepscraper-plan = "deepscraper.cli:plan"
+deepscraper-parse = "deepscraper.cli:parse"
+deepscraper-resume = "deepscraper.cli:resume"
+deepscraper-report = "deepscraper.cli:report"
+deepscraper-worker = "deepscraper.tasks.queue:worker"
+
+[tool.poetry.plugins."poetry.plugin"]
+# reserved for future use
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "B", "UP", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_configs = true
+strict_optional = true
+check_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+follow_imports = "silent"
+plugins = []
