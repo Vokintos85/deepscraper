@@ -1,0 +1,47 @@
+{
+  "url": "https://httpbin.org/html",
+  "goal": "Извлечь заголовок H1 и основной текст страницы",
+  "steps": [
+    {
+      "action": "navigate",
+      "target": "https://httpbin.org/html",
+      "value": null,
+      "wait": null
+    },
+    {
+      "action": "wait",
+      "target": null,
+      "value": null,
+      "wait": {
+        "type": "network_idle",
+        "selector": null,
+        "timeout_ms": 5000
+      }
+    },
+    {
+      "action": "extract",
+      "target": "fields",
+      "value": null,
+      "wait": null
+    }
+  ],
+  "fields": [
+    {
+      "name": "title",
+      "selector": "h1, .title, .heading, .page-title, .entry-title, .post-title, .article-title, header h1, .main-title, h1:first-of-type",
+      "attr": null,
+      "required": true
+    },
+    {
+      "name": "content",
+      "selector": "p, .content, .entry-content, .post-content, .article-content, .main-content, .text-content, .body-content, .page-content, .story-content, .description, .excerpt, .summary, .text, .copy",
+      "attr": null,
+      "required": true
+    }
+  ],
+  "pagination": {
+    "type": "none",
+    "selector": null,
+    "max_pages": 1
+  }
+}

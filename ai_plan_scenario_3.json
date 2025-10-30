@@ -1,0 +1,65 @@
+{
+  "url": "https://company.com/about",
+  "goal": "Найти контактные данные: email, телефоны, адреса и социальные сети",
+  "steps": [
+    {
+      "action": "navigate",
+      "target": "https://company.com/about",
+      "value": null,
+      "wait": null
+    },
+    {
+      "action": "wait",
+      "target": null,
+      "value": null,
+      "wait": {
+        "type": "network_idle",
+        "selector": null,
+        "timeout_ms": 5000
+      }
+    },
+    {
+      "action": "extract",
+      "target": "contact_data",
+      "value": null,
+      "wait": null
+    }
+  ],
+  "fields": [
+    {
+      "name": "emails",
+      "selector": "a[href^=\"mailto:\"], [href*=\"mailto:\"], [class*=\"email\" i], [id*=\"email\" i], [class*=\"contact\" i] a[href*=\"@\"], [class*=\"mail\" i], body :contains(\"@\")",
+      "attr": null,
+      "required": false
+    },
+    {
+      "name": "phones",
+      "selector": "a[href^=\"tel:\"], [href*=\"tel:\"], [class*=\"phone\" i], [id*=\"phone\" i], [class*=\"tel\" i], [class*=\"contact\" i] :contains(\"+\"), [class*=\"contact\" i] :contains(\"(\")",
+      "attr": null,
+      "required": false
+    },
+    {
+      "name": "addresses",
+      "selector": "[class*=\"address\" i], [id*=\"address\" i], [class*=\"location\" i], [class*=\"office\" i], [class*=\"contact\" i] address, [itemprop=\"address\"], .contact-info address, footer address",
+      "attr": null,
+      "required": false
+    },
+    {
+      "name": "social_media",
+      "selector": "a[href*=\"facebook.com\"], a[href*=\"twitter.com\"], a[href*=\"linkedin.com\"], a[href*=\"instagram.com\"], a[href*=\"youtube.com\"], a[href*=\"t.me\"], [class*=\"social\" i] a, [class*=\"icon\" i] a[href*=\".com\"], footer a[href*=\".com\"]",
+      "attr": null,
+      "required": false
+    },
+    {
+      "name": "contact_section",
+      "selector": "[class*=\"contact\" i], [id*=\"contact\" i], .contact-info, .contact-details, footer, .footer, address, [class*=\"footer\" i]",
+      "attr": null,
+      "required": false
+    }
+  ],
+  "pagination": {
+    "type": "none",
+    "selector": null,
+    "max_pages": 1
+  }
+}
