@@ -1,0 +1,59 @@
+{
+  "url": "https://news-site.com/articles",
+  "goal": "Извлечь заголовки статей, даты публикации, авторов и краткое содержание",
+  "steps": [
+    {
+      "action": "navigate",
+      "target": "https://news-site.com/articles",
+      "value": null,
+      "wait": null
+    },
+    {
+      "action": "wait",
+      "target": null,
+      "value": null,
+      "wait": {
+        "type": "network_idle",
+        "selector": null,
+        "timeout_ms": 5000
+      }
+    },
+    {
+      "action": "extract",
+      "target": "article_list",
+      "value": null,
+      "wait": null
+    }
+  ],
+  "fields": [
+    {
+      "name": "title",
+      "selector": "article h2, .article-title, .title, h1, h3, [class*='title'], [class*='headline']",
+      "attr": null,
+      "required": true
+    },
+    {
+      "name": "publication_date",
+      "selector": "time, .date, .published, .timestamp, [datetime], [class*='date'], [class*='time']",
+      "attr": null,
+      "required": true
+    },
+    {
+      "name": "author",
+      "selector": ".author, .byline, [rel='author'], [class*='author'], [class*='writer'], [class*='by']",
+      "attr": null,
+      "required": false
+    },
+    {
+      "name": "summary",
+      "selector": ".excerpt, .summary, .description, p.lead, article > p:first-of-type, [class*='excerpt'], [class*='summary']",
+      "attr": null,
+      "required": true
+    }
+  ],
+  "pagination": {
+    "type": "auto_detect",
+    "selector": null,
+    "max_pages": 10
+  }
+}

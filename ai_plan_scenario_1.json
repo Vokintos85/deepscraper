@@ -1,0 +1,59 @@
+{
+  "url": "https://example.com/products",
+  "goal": "Собрать названия товаров, цены, описания и изображения с поддержкой пагинации",
+  "steps": [
+    {
+      "action": "navigate",
+      "target": "https://example.com/products",
+      "value": null,
+      "wait": null
+    },
+    {
+      "action": "wait",
+      "target": null,
+      "value": null,
+      "wait": {
+        "type": "network_idle",
+        "selector": null,
+        "timeout_ms": 5000
+      }
+    },
+    {
+      "action": "extract",
+      "target": "products",
+      "value": null,
+      "wait": null
+    }
+  ],
+  "fields": [
+    {
+      "name": "title",
+      "selector": ".product-title, .product-name, h3, [data-testid='product-title'], .name",
+      "attr": null,
+      "required": true
+    },
+    {
+      "name": "price",
+      "selector": ".product-price, .price, .current-price, [data-testid='price'], .cost",
+      "attr": null,
+      "required": true
+    },
+    {
+      "name": "description",
+      "selector": ".product-description, .description, .product-details, [data-testid='description'], p",
+      "attr": null,
+      "required": false
+    },
+    {
+      "name": "image",
+      "selector": ".product-image img, .thumbnail img, [data-testid='product-image'] img, .main-image img",
+      "attr": null,
+      "required": true
+    }
+  ],
+  "pagination": {
+    "type": "next_button",
+    "selector": ".pagination-next, .next-page, [aria-label='Next'], .load-more, a[rel='next']",
+    "max_pages": 10
+  }
+}
