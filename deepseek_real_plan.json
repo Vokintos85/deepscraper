@@ -1,0 +1,59 @@
+{
+  "url": "https://httpbin.org/html",
+  "goal": "Извлечь заголовок H1 и все параграфы текста",
+  "steps": [
+    {
+      "action": "navigate",
+      "target": "https://httpbin.org/html",
+      "value": null,
+      "wait": null
+    },
+    {
+      "action": "wait",
+      "target": null,
+      "value": null,
+      "wait": {
+        "type": "network_idle",
+        "selector": null,
+        "timeout_ms": 4000
+      }
+    },
+    {
+      "action": "extract",
+      "target": "main-content",
+      "value": null,
+      "wait": null
+    }
+  ],
+  "fields": [
+    {
+      "name": "title",
+      "selector": "h1, .title, [role=heading]",
+      "attr": null,
+      "required": true
+    },
+    {
+      "name": "content",
+      "selector": "main, article, .content, p",
+      "attr": null,
+      "required": true
+    },
+    {
+      "name": "subtitle",
+      "selector": "h2, h3, .subtitle",
+      "attr": null,
+      "required": false
+    },
+    {
+      "name": "links",
+      "selector": "a",
+      "attr": "href",
+      "required": false
+    }
+  ],
+  "pagination": {
+    "type": "none",
+    "selector": null,
+    "max_pages": 1
+  }
+}
