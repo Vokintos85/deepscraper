@@ -1,49 +1,64 @@
-# Deepscraper
+# DeepScraper — Универсальная платформа для веб-скрапинга с искусственным интеллектом
 
-Deepscraper is a CLI-first scraping platform that pairs a Playwright-powered runner with an AI-assisted planning pipeline. It is designed for collecting structured data from modern web applications, including SPAs with dynamic filters and network activity.
+**DeepScraper** — это мощная AI-платформа для сбора данных, сочетающая браузерную автоматизацию на **Playwright** с интеллектуальным планированием через **DeepSeek API**.  
+Предназначена для работы с современными веб-приложениями, включая **SPA** с динамическими фильтрами и защитой от ботов.
 
-## Features
-- Plan scraping strategies with the DeepSeek API or a deterministic heuristic fallback.
-- Execute browser automation with Playwright, stealth tuning, proxy rotation, and captcha solving hooks.
-- Persist run metadata and scraped items into PostgreSQL, with Redis-backed job queues and MinIO for raw assets.
-- Export collected data into CSV, Excel, or JSON formats.
-- Resume paused runs and generate simple reports from stored metadata.
+---
 
-## Quickstart
+##  Возможности
 
-### Prerequisites
-- Python 3.11+
-- [Poetry](https://python-poetry.org/) for dependency management.
-- Docker and docker-compose for running the backing services.
+-  AI-планирование** — генерация стратегий парсинга через DeepSeek API или эвристический фолбэк  
+-  Браузерная автоматизация** — Playwright с поддержкой SPA, stealth-режимом и ротацией прокси  
+-  Обход защиты** — stealth-техники, решение капч, смена User-Agent и cookie-jar  
+-  Капча-сервисы** — интеграция с 2Captcha для reCAPTCHA, hCaptcha и image captcha  
+-  Сохранение данных** — PostgreSQL для метаданных, Redis для очередей, MinIO для HTML-снимков и файлов  
+-  Экспорт** — поддержка CSV, Excel и JSON  
+-  Продолжение работы** — возобновление прерванных сессий после сбоев  
 
-### Setup
-1. Create a virtual environment and install dependencies:
+---
+
+##  Быстрый старт
+
+### Требования
+
+- Python **3.11+**
+- [Poetry](https://python-poetry.org/) — управление зависимостями
+- **Docker** и **docker-compose** — для инфраструктурных сервисов (Postgres, Redis, MinIO)
+
+---
+
+###  Установка
+
+1. **Установите зависимости:**
    ```bash
    poetry install
    poetry run playwright install
    ```
 
-2. Copy the example environment file and update the secrets:
+2. **Настройте окружение:**
    ```bash
    cp .env.example .env
+   # Отредактируйте .env и добавьте ваши API-ключи
    ```
 
-3. Start the infrastructure services:
+3. **Запустите инфраструктуру:**
    ```bash
    docker compose up -d postgres redis minio
    ```
 
-4. Create the MinIO bucket listed in `.env` (defaults to `deepscraper`). You can use the MinIO Console at http://localhost:9001 to create it.
+---
 
-5. Generate a plan for a target site:
+##  Использование
+
+1. **Создайте план парсинга:**
    ```bash
    poetry run deepscraper plan \
      --url "https://example.com/products" \
-     --goal "Collect product names, prices, and SKUs" \
+     --goal "Собрать названия, цены и артикулы товаров" \
      --out plan.json
    ```
 
-6. Execute the scraping run using the generated plan and export the collected data:
+2. **Запустите парсинг:**
    ```bash
    poetry run deepscraper parse \
      --plan plan.json \
@@ -52,22 +67,18 @@ Deepscraper is a CLI-first scraping platform that pairs a Playwright-powered run
      --export csv
    ```
 
-7. Resume a paused run or inspect previous runs:
-   ```bash
-   poetry run deepscraper resume --project example-products
-   poetry run deepscraper report --project example-products
-   ```
+---
 
-## Troubleshooting
-- **Timeouts or blank pages**: increase the `PAGE_TIMEOUT` setting or use a residential proxy list.
-- **Captcha loops**: configure a captcha provider (`CAPTCHA_PROVIDER` and `CAPTCHA_API_KEY`).
-- **Proxy bans**: expand the proxy pool and enable sticky sessions in `PROXY_LIST_PATH`.
-- **LLM failures**: ensure the DeepSeek API key is set; otherwise the planner falls back to heuristic steps.
+## Архитектура
 
-## Development
-- Run formatting and linting with `make fmt` and `make lint`.
-- Execute the test suite with `make test`.
-- Use `make up`/`make down` to manage the docker-compose services.
+- Core:** Python 3.11, Playwright, AsyncIO  
+- AI Layer:** DeepSeek API (LLM-планирование действий)  
+- Storage:** PostgreSQL, Redis, MinIO (S3-совместимый стор)  
+- Exports:** CSV, Excel, JSON  
+- CLI: чистая архитектура, типизация, структура модулей по слоям  
 
-## License
-This project is licensed under the terms of the MIT license. See [LICENSE](LICENSE).
+
+
+
+
+
