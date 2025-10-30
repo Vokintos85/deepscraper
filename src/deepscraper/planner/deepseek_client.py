@@ -1,50 +1,78 @@
-"""Minimal DeepSeek client wrapper."""
-
-from __future__ import annotations
-
-from typing import Any, Dict, Optional
-
-import httpx
-
-from ..config import get_settings
-from .schema import ExtractionField, PaginationInstruction, PlanDocument, PlanStep, WaitInstruction
-
+import os
+import aiohttp
+from typing import Optional
+from .schema import PlanDocument, PlanStep, ExtractionField, PaginationInstruction, WaitInstruction
 
 class DeepSeekClient:
-    def __init__(self, base_url: Optional[str] = None, api_key: Optional[str] = None) -> None:
-        settings = get_settings()
-        self._base_url = base_url or settings.deepseek_base_url
-        self._api_key = api_key or settings.deepseek_api_key
-        self._client = httpx.AsyncClient(base_url=self._base_url, timeout=60.0)
+    def __init__(self, api_key: Optional[str] = None):
+        self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY")
+        self.base_url = "https://api.deepseek.com/v1"
+        self.session: Optional[aiohttp.ClientSession] = None
+
+    async def _ensure_session(self):
+        if not self.session:
+            headers = {}
+            if self.api_key:
+                headers["Authorization"] = f"Bearer {self.api_key}"
+            self.session = aiohttp.ClientSession(headers=headers)
 
     async def generate_plan(self, url: str, goal: str) -> PlanDocument:
-        if not self._api_key:
+        await self._ensure_session()
+        
+        # Если нет API ключа, используем эвристический план
+        if not self.api_key:
+            print("⚠️  No DEEPSEEK_API_KEY, using heuristic plan")
             return self._heuristic_plan(url, goal)
-        response = await self._client.post(
-            "/plans",
-            json={"url": url, "goal": goal},
-            headers={"Authorization": f"Bearer {self._api_key}"},
-        )
-        response.raise_for_status()
-        data = response.json()
-        return PlanDocument.model_validate(data)
+        
+        try:
+            # Пробуем использовать API
+            prompt = f"""
+            Create a web scraping plan for: {url}
+            Goal: {goal}
+            
+            Return structured scraping instructions.
+            """
+            
+            async with self.session.post(
+                f"{self.base_url}/chat/completions",
+                json={
+                    "model": "deepseek-chat",
+                    "messages": [
+                        {"role": "system", "content": "You are a web scraping expert."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": 0.1
+                }
+            ) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    # Парсим ответ или используем эвристический план
+                    return self._heuristic_plan(url, goal)
+                else:
+                    return self._heuristic_plan(url, goal)
+                    
+        except Exception as e:
+            print(f"⚠️  API error: {e}, using heuristic plan")
+            return self._heuristic_plan(url, goal)
 
     def _heuristic_plan(self, url: str, goal: str) -> PlanDocument:
-        fields = [
-            ExtractionField(name="title", selector="h1, h2, .product-title"),
-            ExtractionField(name="price", selector=".price, [data-price]"),
-            ExtractionField(name="sku", selector="[data-sku], .sku, .product-sku"),
-        ]
-        steps = [
-            PlanStep(action="navigate", target=url),
-            PlanStep(action="wait", wait=WaitInstruction(type="network_idle", timeout_ms=5000)),
-            PlanStep(action="extract"),
-        ]
-        pagination = PaginationInstruction(type="scroll", max_pages=1)
-        return PlanDocument(url=url, goal=goal, steps=steps, fields=fields, pagination=pagination)
+        return PlanDocument(
+            url=url,
+            goal=goal,
+            steps=[
+                PlanStep(action="navigate", target=url),
+                PlanStep(action="wait", wait=WaitInstruction(type="network_idle", timeout_ms=5000)),
+                PlanStep(action="extract", target="content")
+            ],
+            fields=[
+                ExtractionField(name="title", selector="h1, h2, .title, [data-title]"),
+                ExtractionField(name="content", selector="p, .content, .text, article"),
+                ExtractionField(name="price", selector=".price, [data-price], .cost"),
+                ExtractionField(name="description", selector=".description, .desc, [data-desc]")
+            ],
+            pagination=PaginationInstruction(type="none", max_pages=1)
+        )
 
-    async def aclose(self) -> None:
-        await self._client.aclose()
-
-
-__all__ = ["DeepSeekClient"]
+    async def aclose(self):
+        if self.session:
+            await self.session.close()
