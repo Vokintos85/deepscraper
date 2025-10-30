@@ -13,7 +13,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Central configuration for the scraping platform."""
 
-    model_config = SettingsConfigDict(env_file=Path(__file__).resolve().parent.parent.parent / ".env", env_file_encoding="utf-8", env_nested_delimiter="__", extra="allow")
+    model_config = SettingsConfigDict(
+        env_file=Path(__file__).resolve().parent.parent.parent / ".env",
+        env_file_encoding="utf-8",
+        env_nested_delimiter="__",
+        extra="allow",
+        env_prefix=""
+    )
 
     deepseek_api_key: Optional[str] = Field(default=None, alias="DEEPSEEK_API_KEY")
     deepseek_base_url: str = Field(default="https://api.deepseek.com/v1", alias="DEEPSEEK_BASE_URL")
@@ -38,9 +44,6 @@ class Settings(BaseSettings):
     max_concurrency: int = Field(default=4, alias="MAX_CONCURRENCY")
     export_dir: Path = Field(default=Path("./exports"), alias="EXPORT_DIR")
 
-    class Config:
-        env_prefix = ""
-
     @property
     def proxy_list(self) -> List[str]:
         if not self.proxy_list_path.exists():
@@ -51,7 +54,6 @@ class Settings(BaseSettings):
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     """Return cached application settings."""
-
     return Settings()
 
 
